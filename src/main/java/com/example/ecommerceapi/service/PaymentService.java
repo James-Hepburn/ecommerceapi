@@ -1,7 +1,8 @@
 package com.example.ecommerceapi.service;
 
-import com.example.ecommerceapi.model.Cart;
-import com.example.ecommerceapi.model.User;
+import com.example.ecommerceapi.model.*;
+import com.example.ecommerceapi.repository.CartRepository;
+import com.example.ecommerceapi.repository.OrderRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -12,10 +13,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class PaymentService {
+    private CartService cartService;
+    private OrderRepository orderRepository;
+    private CartRepository cartRepository;
+
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
@@ -31,7 +38,35 @@ public class PaymentService {
                 .setCurrency ("usd")
                 .addPaymentMethodType ("card")
                 .build ();
-
         return PaymentIntent.create (params);
+    }
+
+    public Order createOrderFromCart (Cart cart, User user) {
+        Order order = new Order ();
+        order.setUser (user);
+
+        List <OrderItem> items = new ArrayList<>();
+
+        for (CartItem cartItem : cart.getItems ()) {
+            OrderItem orderItem = new OrderItem ();
+            orderItem.setProduct (cartItem.getProduct ());
+            orderItem.setQuantity (cartItem.getQuantity ());
+            orderItem.setPrice (cartItem.getProduct ().getPrice ());
+            orderItem.setOrder (order);
+            items.add (orderItem);
+        }
+
+        order.setItems (items);
+        order.setTotalPrice (cart.getTotalPrice ());
+
+        cart.getItems ().clear ();
+        cart.setTotalPrice (BigDecimal.ZERO);
+
+        this.cartRepository.save (cart);
+        return this.orderRepository.save (order);
+    }
+
+    public String createStripeCheckoutSession (Cart cart) {
+        return "stripe-session-id-placeholder";
     }
 }
