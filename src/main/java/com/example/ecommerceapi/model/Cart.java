@@ -29,7 +29,7 @@ public class Cart {
 @Setter
 @NoArgsConstructor
 @Entity
-class CartItem {
+public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
