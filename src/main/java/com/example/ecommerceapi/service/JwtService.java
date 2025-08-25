@@ -3,7 +3,6 @@ package com.example.ecommerceapi.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -11,9 +10,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
-
+    private String jwtSecret = System.getenv ("APP_JWT_SECRET");
     private long JWT_EXPIRATION = 1000 * 60 * 60 * 24;
 
     public String generateToken (String username) {
@@ -25,7 +22,7 @@ public class JwtService {
                 .compact ();
     }
 
-    public boolean validateToken (String token, String username) {
+    public boolean isTokenValid (String token, String username) {
         return username.equals (extractUsername (token)) && !isTokenExpired (token);
     }
 

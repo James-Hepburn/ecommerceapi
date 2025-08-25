@@ -23,4 +23,11 @@ public class Product {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public Product (String name, String description, BigDecimal price, int quantity) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.quantity = quantity;
+    }
 }

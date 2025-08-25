@@ -19,12 +19,12 @@ public class AuthService {
     public String register (User user) {
         user.setPassword (this.passwordEncoder.encode (user.getPassword ()));
         this.userRepository.save (user);
-        return this.jwtService.generateToken (user);
+        return this.jwtService.generateToken (user.getUsername ());
     }
 
     public String login (String username, String password) {
         this.authenticationManager.authenticate (new UsernamePasswordAuthenticationToken (username, password));
         User user = this.userRepository.findByUsername (username).orElseThrow (() -> new IllegalArgumentException ("User not found"));
-        return this.jwtService.generateToken (user);
+        return this.jwtService.generateToken (user.getUsername ());
     }
 }

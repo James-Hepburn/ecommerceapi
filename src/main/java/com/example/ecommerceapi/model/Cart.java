@@ -24,22 +24,3 @@ public class Cart {
 
     private BigDecimal totalPrice;
 }
-
-@Getter
-@Setter
-@NoArgsConstructor
-@Entity
-public class CartItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne
-    private Product product;
-
-    private int quantity;
-
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
-}

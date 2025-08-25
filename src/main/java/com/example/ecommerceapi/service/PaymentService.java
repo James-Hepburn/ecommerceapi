@@ -8,8 +8,6 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,17 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class PaymentService {
     private CartService cartService;
     private OrderRepository orderRepository;
     private CartRepository cartRepository;
-
-    @Value("${stripe.api.key}")
     private String stripeApiKey;
+
+    public PaymentService (CartService cartService, OrderRepository orderRepository, CartRepository cartRepository) {
+        this.cartService = cartService;
+        this.orderRepository = orderRepository;
+        this.cartRepository = cartRepository;
+    }
 
     @PostConstruct
     public void init () {
+        this.stripeApiKey = System.getenv("STRIPE_API_KEY");
+        if (this.stripeApiKey == null || this.stripeApiKey.isEmpty ()) {
+            throw new IllegalStateException ("Stripe API key not set in environment variables");
+        }
         Stripe.apiKey = this.stripeApiKey;
     }
 
